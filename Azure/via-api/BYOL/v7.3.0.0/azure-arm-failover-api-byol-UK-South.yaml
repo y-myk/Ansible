@@ -1,5 +1,5 @@
-# Create standalone 3NIC BIG-IP in Azure
-#
+#Create via-api BIG-IP HA cluster in Azure
+
 # You need to create a file named azure_creds.yaml (update path below) with the following variables:
 #
 # subscription_id_var: "--your-subscription-id-here--"
@@ -8,6 +8,7 @@
 # secret_var: "--your-secret-here--"
 # adminpass_var: "--bigip-admin-user-password--"
 # license_var_1: "--bigip-registration-key--"
+# license_var_2: "--bigip-registration-key--"
 
 ---
 
@@ -23,9 +24,10 @@
         state: present
 #        state: absent
         subscription_id: "{{ subscription_id_var }}"
-        resource_group_name: 3nic-rg
-        template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/v8.1.1.0/supported/standalone/3nic/existing-stack/byol/azuredeploy.json"
-        location: "UK South"
+        resource_group_name: demo-lab
+        template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/v7.3.0.0/supported/failover/same-net/via-api/n-nic/existing-stack/byol/azuredeploy.json"
+        #location: "UK South"
+        location: "West US"
         client_id: "{{ client_id_var }}"
         tenant: "{{ tenant_var }}"
         secret: "{{ secret_var }}"
@@ -37,49 +39,55 @@
           adminPasswordOrKey:
             value: "{{ adminpass_var }}"
           dnsLabel:
-            value: three-nic
+            value: via-api
           instanceName:
-            value: 3nic-byol
+            value: f501
           instanceType:
             value: Standard_DS3_v2
-          imageName:
-            value: AllTwoBootLocations
           bigIpVersion:
-            value: "15.1.004000"
+            value: "15.0.100000"
+          customImage:
+            value: "OPTIONAL"
           bigIpModules:
             value: "ltm:nominal"
-          numberOfExternalIps:
-            value: 1
+          imageName:
+            value: AllTwoBootLocations
           licenseKey1:
             value: "{{ license_var_1 }}"
+          licenseKey2:
+            value: "{{ license_var_2 }}"
+          numberOfExternalIps:
+            value: 1
+          provisionPublicIP:
+            value: "Yes"
+          numberOfAdditionalNics:
+            value: 0
           vnetName:
             value: vnet-01
           vnetResourceGroupName:
-            value: 3nic-rg
+            value: demo-lab
           mgmtSubnetName:
             value: mgmt
-          mgmtIpAddress:
-            value: "10.3.0.20"
+          mgmtIpAddressRangeStart:
+            value: 10.3.0.10
           externalSubnetName:
             value: external
+          externalIpSelfAddressRangeStart:
+            value: 10.3.1.10
           externalIpAddressRangeStart:
-            value: 10.3.1.20
+            value: 10.3.1.100
           internalSubnetName:
             value: internal
-          internalIpAddress:
-            value: 10.3.2.20
-          avSetChoice:
-            value: "CREATE_NEW"
-          zoneChoice:
-            value: "1"
+          internalIpAddressRangeStart:
+            value: 10.3.2.10
           declarationUrl:
             value: "NOT_SPECIFIED"
+          managedRoutes:
+            value: 0.0.0.0/0,10.3.0.0/24,10.3.1.0/24,10.3.2.0/24
           ntpServer:
-            value: "0.pool.ntp.org"
+            value: 0.pool.ntp.org
           timeZone:
             value: UTC
-          customImage:
-            value: "OPTIONAL"
           restrictedSrcAddress:
             value: "*"
           tagValues:
@@ -90,4 +98,10 @@
               group: GROUP
               owner: OWNER
           allowUsageAnalytics:
-            value: "No"
+            value: 'No'
+          tenantId:
+            value: "{{ tenant_var }}"
+          clientId:
+            value: "{{ client_id_var }}"
+          servicePrincipalSecret:
+            value: "{{ secret_var }}"
