@@ -1,0 +1,75 @@
+# Create Resource Group, vnet, and subnets.
+
+# You need to create a file named azure_creds.yaml (update path below) with the following variables:
+# 
+# subscription_id_var: "--your-subscription-id-here--"
+# client_id_var: "--your-client-id-here--"
+# tenant_var: "--your-tenant-here--"
+# secret_var: "--your-secret-here--"
+# adminpass_var: "--bigip-admin-user-password--"
+# license_var_1: "--bigip-registration-key--"
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+   - /root/azure_creds.yaml
+
+  tasks:
+   - name: Create a resource group
+     azure_rm_resourcegroup:
+      name: demo-lab
+      state: present
+      location: "West US"
+      subscription_id: "{{ subscription_id_var }}"
+      client_id: "{{ client_id_var }}"
+      tenant: "{{ tenant_var }}"
+      secret: "{{ secret_var }}" 
+   
+   - name: Create vnet
+     azure_rm_virtualnetwork:
+      name: vnet-01
+      state: present
+      address_prefixes_cidr: "10.3.0.0/16"
+      resource_group: demo-lab
+      subscription_id: "{{ subscription_id_var }}"
+      client_id: "{{ client_id_var }}"
+      tenant: "{{ tenant_var }}"
+      secret: "{{ secret_var }}"
+
+   - name: Create mgmt subnet
+     azure_rm_subnet:
+      name: mgmt
+      state: present
+      resource_group: demo-lab
+      virtual_network_name: vnet-01
+      address_prefix_cidr: "10.3.0.0/24"
+      subscription_id: "{{ subscription_id_var }}"
+      client_id: "{{ client_id_var }}"
+      tenant: "{{ tenant_var }}"
+      secret: "{{ secret_var }}"
+
+   - name: Create external subnet
+     azure_rm_subnet:
+      name: external
+      state: present
+      resource_group: demo-lab
+      virtual_network_name: vnet-01
+      address_prefix_cidr: "10.3.1.0/24"
+      subscription_id: "{{ subscription_id_var }}"
+      client_id: "{{ client_id_var }}"
+      tenant: "{{ tenant_var }}"
+      secret: "{{ secret_var }}"
+
+   - name: Create internal subnet
+     azure_rm_subnet:
+      name: internal
+      state: present
+      resource_group: demo-lab
+      virtual_network_name: vnet-01
+      address_prefix_cidr: "10.3.2.0/24"
+      subscription_id: "{{ subscription_id_var }}"
+      client_id: "{{ client_id_var }}"
+      tenant: "{{ tenant_var }}"
+      secret: "{{ secret_var }}"
+

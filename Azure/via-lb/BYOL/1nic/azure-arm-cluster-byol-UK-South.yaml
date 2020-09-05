@@ -1,0 +1,82 @@
+#Create via-lb BIG-IP HA cluster in Azure
+
+# You need to create a file named azure_creds.yaml (update path below) with the following variables:
+# 
+# subscription_id_var: "--your-subscription-id-here--"
+# client_id_var: "--your-client-id-here--"
+# tenant_var: "--your-tenant-here--"
+# secret_var: "--your-secret-here--"
+# adminpass_var: "--bigip-admin-user-password--"
+# license_var_1: "--bigip-registration-key--"
+# license_var_2: "--bigip-registration-key--"
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - /root/azure_creds.yaml
+
+  tasks:
+    - name: BIG-IP_HA_cluster_upddated
+      azure_rm_deployment:
+        state: present
+#        state: absent
+        subscription_id: "{{ subscription_id_var }}"
+        resource_group_name: "sealy"
+        template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/v8.1.1.0/supported/failover/same-net/via-lb/1nic/existing-stack/byol/azuredeploy.json"
+        location: "UK South"
+        client_id: "{{ client_id_var }}"
+        tenant: "{{ tenant_var }}"
+        secret: "{{ secret_var }}"
+        parameters:
+          authenticationType:
+            value: "password"
+          adminUsername:
+            value: "azureuser"
+          adminPasswordOrKey:
+            value: "{{ adminpass_var }}"
+          dnsLabel:
+            value: "via-lb"
+          instanceType:
+            value: "Standard_DS3_v2"
+          imageName:
+            value: "AllTwoBootLocations"
+          bigIpVersion:
+            value: "15.1.004000"
+          bigIpModules:
+            value: "ltm:nominal"
+          licenseKey1:
+            value: "{{ license_var_1 }}"
+          licenseKey2:
+            value: "{{ license_var_2 }}"
+          vnetName:
+            value: "vnet-01"
+          vnetResourceGroupName:
+            value: "sealy"
+          mgmtSubnetName:
+            value: mgmt
+          mgmtIpAddressRangeStart:
+            value: 10.3.0.10
+          provisionPublicIP:
+            value: "Yes"
+          declarationUrl:
+            value: "NOT_SPECIFIED"
+          ntpServer:
+            value: "0.pool.ntp.org"
+          timeZone:
+            value: "UTC"
+          customImage:
+            value: "OPTIONAL"
+          restrictedSrcAddress:
+            value: "*"
+          tagValues:
+            value:
+              application: "APP"
+              cost: "COST"
+              environment: "ENV"
+              group: "GROUP"
+              owner: "OWNER"
+          allowUsageAnalytics:
+            value: "No"
+          numberOfInstances:
+            value: 2
