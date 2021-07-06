@@ -1,13 +1,11 @@
 # Create standalone 3NIC BIG-IP in Azure
 #
-# You need to create a file named azure_creds.yaml (update path below) with the following variables:
+# You need to create a file named /root/azure_creds.yaml with the following variables:
 #
 # subscription_id_var: "--your-subscription-id-here--"
 # client_id_var: "--your-client-id-here--"
 # tenant_var: "--your-tenant-here--"
 # secret_var: "--your-secret-here--"
-# adminpass_var: "--bigip-admin-user-password--"
-# license_var_1: "--bigip-registration-key--"
 
 ---
 
@@ -16,69 +14,75 @@
   gather_facts: no
   vars_files:
     - /root/azure_creds.yaml
+    - arm-template-vars.yaml
 
   tasks:
-    - name: Azure Deploy to vnet-01
+    - name: Ansible deploy 3nic BIG-IP PAYG
       azure_rm_deployment:
-        state: present
-#        state: absent
+        state: "{{ resource_state }}"
+        deployment_name: "{{ deployment_name }}"
         subscription_id: "{{ subscription_id_var }}"
-        resource_group_name: bello_RG01
-        template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/master/supported/standalone/3nic/existing-stack/payg/azuredeploy.json"
-        location: "UK South"
+        resource_group_name: "{{ rg_name }}"
+        template_link: "{{ template_link }}"
+        location: "{{ location }}"
         client_id: "{{ client_id_var }}"
         tenant: "{{ tenant_var }}"
         secret: "{{ secret_var }}"
         parameters:
           adminUsername:
-            value: azureuser
+            value: "{{ adminUsername }}"
           authenticationType:
-            value: password
+            value: "{{ authenticationType }}"
           adminPasswordOrKey:
-            value: "{{ adminpass_var }}"
+            value: "{{ adminPasswordOrKey }}"
           dnsLabel:
-            value: three-nic
+            value: "{{ dnsLabel }}"
           instanceName:
-            value: 3nic-payg
+            value: "{{ instanceName }}"
           instanceType:
-            value: Standard_DS3_v2
-#            value: Standard_DS4_v2 
+            value: "{{ instanceType }}"
           imageName:
-            value: Best25Mbps
+            value: "{{ imageName }}"
           bigIpVersion:
-            value: "15.1.004000"
+            value: "{{ bigIpVersion }}"
+          bigIpModules:
+            value: "{{ bigIpModules }}"
           numberOfExternalIps:
-            value: 1
+            value: "{{ numberOfExternalIps }}"
           vnetName:
-            value: vnet-01
+            value: "{{ vnetName }}"
           vnetResourceGroupName:
-            value: bello_RG01
+            value: "{{ rg_name }}"
           mgmtSubnetName:
-            value: mgmt
+            value: "{{ subnet1 }}"
           mgmtIpAddress:
-            value: "10.3.0.20"
+            value: "{{ mgmtIpAddress }}"
           externalSubnetName:
-            value: external
+            value: "{{ subnet2 }}"
           externalIpAddressRangeStart:
-            value: 10.3.1.20
+            value: "{{ externalIpAddressRangeStart }}"
           internalSubnetName:
-            value: internal
+            value: "{{ subnet3 }}"
           internalIpAddress:
-            value: 10.3.2.20
+            value: "{{ internalIpAddress }}"
           avSetChoice:
-            value: "CREATE_NEW"
+            value: "{{ avSetChoice }}"
           zoneChoice:
-            value: "1"
+            value: "{{ zoneChoice }}"
+          provisionPublicIP:
+            value: "{{ provisionPublicIP }}"
           declarationUrl:
-            value: "NOT_SPECIFIED"
+            value: "{{ declarationUrl }}"
           ntpServer:
-            value: "0.pool.ntp.org"
+            value: "{{ ntpServer }}"
           timeZone:
-            value: UTC
+            value: "{{ timeZone }}"
           customImage:
-            value: "OPTIONAL"
+            value: "{{ customImage }}"
+          customImageUrn:
+            value: "{{ customImageUrn }}"
           restrictedSrcAddress:
-            value: "*"
+            value: "{{ restrictedSrcAddress }}"
           tagValues:
             value:
               application: APP
@@ -87,4 +91,4 @@
               group: GROUP
               owner: OWNER
           allowUsageAnalytics:
-            value: "No"
+            value: "{{ allowUsageAnalytics }}"

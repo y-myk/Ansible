@@ -1,0 +1,4 @@
+# If Resource group, VNet and subnets have already been created in Azure, comment out "- import_playbook: create-rg.yaml" line.
+
+- import_playbook: create-rg.yaml
+- import_playbook: azure-arm-3nic-payg-UK-South.yaml
