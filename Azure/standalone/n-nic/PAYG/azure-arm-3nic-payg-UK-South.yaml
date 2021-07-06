@@ -1,0 +1,95 @@
+# Create standalone 3NIC BIG-IP in Azure
+# 
+#  You need to create a file named azure_creds.yaml (update path below) with the following variables:
+# 
+#  subscription_id_var: "--your-subscription-id-here--"
+# #
+# client_id_var: "--your-client-id-here--"
+# tenant_var: "--your-tenant-here--"
+# secret_var: "--your-secret-here--"
+# adminpass_var: "--bigip-admin-user-password--"
+# license_var_1: "--bigip-registration-key--"
+
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - /root/azure_creds.yaml
+
+  tasks:
+    - name: Azure Deploy to vnet-01
+      azure_rm_deployment:
+        state: present
+#        state: absent
+        subscription_id: "{{ subscription_id_var }}"
+        resource_group_name: "bello_RG01"
+        template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/master/supported/standalone/n-nic/existing-stack/payg/azuredeploy.json"
+        location: "UK South"
+        client_id: "{{ client_id_var }}"
+        tenant: "{{ tenant_var }}"
+        secret: "{{ secret_var }}"
+        parameters:
+          adminUsername:
+            value: azureuser
+          authenticationType:
+            value: password
+          adminPasswordOrKey:
+            value: "{{ adminpass_var }}"
+          dnsLabel:
+            value: four-nic
+          instanceName:
+            value: 3nic-payg
+          instanceType:
+#            value: Standard_DS3_v2
+            value: Standard_DS4_v2 
+          imageName:
+            value: Best25Mbps
+          bigIpVersion:
+            value: "15.1.004000"
+          numberOfExternalIps:
+            value: 1
+          vnetName:
+            value: vnet-01
+          vnetResourceGroupName:
+            value: bello_RG01
+          mgmtSubnetName:
+            value: mgmt
+          mgmtIpAddress:
+            value: "10.3.0.20"
+          externalSubnetName:
+            value: external
+          externalIpAddressRangeStart:
+            value: 10.3.1.20
+          internalSubnetName:
+            value: internal
+          internalIpAddress:
+            value: 10.3.2.20
+          numberOfAdditionalNics:
+            value: 1
+          additionalNicLocation:
+            value: subnet01
+          avSetChoice:
+            value: "CREATE_NEW"
+          zoneChoice:
+            value: "1"
+          declarationUrl:
+            value: "NOT_SPECIFIED"
+          ntpServer:
+            value: "0.pool.ntp.org"
+          timeZone:
+            value: UTC
+          customImage:
+            value: "OPTIONAL"
+          restrictedSrcAddress:
+            value: "*"
+          tagValues:
+            value:
+              application: APP
+              cost: COST
+              environment: ENV
+              group: GROUP
+              owner: OWNER
+          allowUsageAnalytics:
+            value: "No"
