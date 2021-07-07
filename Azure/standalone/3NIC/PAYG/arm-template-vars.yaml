@@ -1,0 +1,38 @@
+---
+rg_name: ansible-rg01
+location: "UK South"
+vnetName: vnet-01
+vnet_address_space: "10.3.0.0/16"
+subnet1: mgmt
+subnet2: external
+subnet3: internal
+subnet1_range: "10.3.0.0/24"
+subnet2_range: "10.3.1.0/24"
+subnet3_range: "10.3.2.0/24"
+resource_state: present
+
+template_link: "https://raw.githubusercontent.com/F5Networks/f5-azure-arm-templates/v9.5.0.0/supported/standalone/3nic/existing-stack/payg/azuredeploy.json"
+deployment_name: ansible-3nic-bigip-payg
+adminUsername: azureuser
+authenticationType: password
+adminPasswordOrKey: Secure3R5Y9u
+dnsLabel: three-nic-ansible-payg
+instanceName: 3nic-ansible-payg
+instanceType: Standard_DS3_v2
+imageName: Best25Mbps
+bigIpVersion: "16.0.101000"
+bigIpModules: "ltm:nominal"
+numberOfExternalIps: 1
+mgmtIpAddress: "DYNAMIC"
+externalIpAddressRangeStart: "DYNAMIC"
+internalIpAddress: "DYNAMIC"
+avSetChoice: "CREATE_NEW"
+zoneChoice: "1"
+provisionPublicIP: "Yes"
+declarationUrl: "NOT_SPECIFIED"
+ntpServer: "0.pool.ntp.org"
+timeZone: UTC
+customImageUrn: "OPTIONAL"
+customImage: "OPTIONAL"
+restrictedSrcAddress: "*"
+allowUsageAnalytics: "No"
